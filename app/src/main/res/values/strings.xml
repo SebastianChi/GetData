@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">GetDataApp</string>
+
+    <!-- message text on the modal after user declined a permission request. 1st parameter is app name, 2nd parameter for permission name -->
+    <string name="declined_permission_message">要使用這app需要%1$s的權限，請到設定裡面打開權限.</string>
+    <!-- storage permission rationale message -->
+    <string name="permission_storage_rationale_message">同意 GetDataApp 存取你的儲存裝置? 這樣才能將抓取到的資料存到裝置中.</string>
+    <!-- 2nd parameter, calendar permission name on the modal declined_permission_message -->
+    <string name="permission_storage">儲存</string>
+
+    <!-- positive button text on modal after user declined a permission request to take them to application settings-->
+    <string name="go_to_settings">前往設定</string>
+    <!-- negative button text on modal after user declined a permission request to do nothing for now -->
+    <string name="not_now">不是現在</string>
+    <string name="va_ok">OK</string>
+
 </resources>
