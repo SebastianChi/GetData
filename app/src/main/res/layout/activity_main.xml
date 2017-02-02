@@ -43,4 +43,36 @@
         android:text="Start get"
         android:layout_below="@id/read_button"
         />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/get_button"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/result_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:textSize="22dp"
+                android:textColor="@color/colorPrimaryDark"
+                android:gravity="center_horizontal"
+                android:layout_centerHorizontal="true"
+                />
+
+            <TextView
+                android:id="@+id/template_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/result_view"
+                android:layout_marginTop="30dp"
+                android:textSize="18dp"
+                android:textColor="@color/colorAccent"
+                android:gravity="left"
+                />
+        </RelativeLayout>
+    </ScrollView>
 </RelativeLayout>

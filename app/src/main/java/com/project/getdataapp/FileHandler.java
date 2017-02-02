@@ -19,6 +19,7 @@ import java.io.File;
 
 public class FileHandler {
     private final Activity activity;
+    private static final String FOLDER_NAME = "/gcis_data";
 
     public FileHandler(final Activity activity) {
         this.activity = activity;
@@ -194,5 +195,9 @@ public class FileHandler {
             }
         }
         return null;
+    }
+
+    public static String getExternalSavePath() {
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + FOLDER_NAME;
     }
 }

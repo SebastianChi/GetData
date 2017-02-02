@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -26,11 +28,18 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int READ_FILE_REQUEST_CODE = 1101;
 
+    String mStartDescription;
+    String mResultDescription;
     UrlParameter[] mUrlParameters;
     View mProgressView;
     int mTaskNumber;
     int mCompletedTaskNumber;
     boolean isGettingData;
+
+    TextView mResultView;
+    TextView mTemplateView;
+    Button mReadButton;
+    Button mGetButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +50,16 @@ public class MainActivity extends AppCompatActivity {
 
         mProgressView = findViewById(R.id.progress_overlay);
 
-        Button getBtn = (Button) findViewById(R.id.get_button);
-        getBtn.setOnClickListener(new View.OnClickListener() {
+        mReadButton = (Button) findViewById(R.id.read_button);
+        mReadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                readSourceFromFile();
+            }
+        });
+
+        mGetButton = (Button) findViewById(R.id.get_button);
+        mGetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(isGettingData == false) {
@@ -53,16 +70,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button readBtn = (Button) findViewById(R.id.read_button);
-        readBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                readSourceFromFile();
-            }
-        });
-
         checkPermission();
-        getFakeData();
+
+        mResultView = (TextView) findViewById(R.id.result_view);
+        mTemplateView = (TextView) findViewById(R.id.template_view);
+        //For testing
+        //getFakeData();
+        mStartDescription = getString(R.string.read_file);
+        mResultDescription = String.format(getString(R.string.get_from), FileHandler.getExternalSavePath());
+
+        mResultView.setText(mStartDescription);
+        mTemplateView.setText(getString(R.string.file_template));
     }
 
     private void checkPermission() {
@@ -78,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 isGettingData = true;
                 mCompletedTaskNumber = 0;
                 mTaskNumber = mUrlParameters.length;
-                showProgressView();
+                showProgress();
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -128,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
         if(isAllTaskFinished()) {
             Log.i(TAG, "all tasks completed");
             isGettingData = false;
-            dismissProgressView();
+            dismissProgress();
         }
     }
 
@@ -166,6 +184,9 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, "Wrong string input, line " + (i + 1));
                 }
             }
+            mResultView.setText(getString(R.string.analyze_complete) +
+                    "\n\n" + mResultDescription
+            );
         } catch (IOException e) {
             Log.e(TAG, "get data failed!!" + e);
             Toast.makeText(this, "檔案有問題", Toast.LENGTH_LONG).show();
@@ -183,12 +204,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void dismissProgressView() {
+    public void dismissProgress() {
         mProgressView.setVisibility(View.GONE);
+        mResultView.setText(getString(R.string.get_complete) +
+                "\n\n" +
+                mResultDescription +
+                "\n\n" +
+                getString(R.string.re_read_file) + mStartDescription
+        );
+        mReadButton.setEnabled(true);
+        mGetButton.setEnabled(true);
     }
 
-    public void showProgressView() {
+    public void showProgress() {
         mProgressView.setVisibility(View.VISIBLE);
+
+        String result = getString(R.string.get_start);
+
+        mResultView.setText(result);
+        mReadButton.setEnabled(false);
+        mGetButton.setEnabled(false);
     }
 
     @Override
@@ -202,6 +237,8 @@ public class MainActivity extends AppCompatActivity {
                     File file = FileHandler.getFileFromUri(this, uri);
                     Log.i(TAG, "File:" + file.toString());
                     if(isTxtFile(file.getName())) {
+                        mResultView.setText(getString(R.string.analyze_file));
+
                         try {
                             InputStream is = new FileInputStream(file);
                             parseFileToParameters(is);

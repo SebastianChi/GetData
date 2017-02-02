@@ -29,7 +29,6 @@ public class GetAndWriteFileTask extends AsyncTask<String, String, Boolean> {
             "http://data.gcis.nat.gov.tw/od/data/api/6BBA2268-1367-4B42-9CCA-BC17499EBE8C?$format=%s" +
             "&$filter=Company_Name like %s" +
             " and Company_Status eq %s";
-    private static final String FOLDER_NAME = "/gcis_data";
     private UrlParameter mParameter;
 
     private String mTargetUrl;
@@ -72,14 +71,6 @@ public class GetAndWriteFileTask extends AsyncTask<String, String, Boolean> {
             //Todo: write to internal
         }
         return result;
-    }
-
-    @Override
-    protected void onProgressUpdate(String... values) {
-        if(values != null && values.length > 0) {
-            Log.i(TAG, "[onProgressUpdate] " + values[0]);
-            super.onProgressUpdate(values);
-        }
     }
 
     @Override
@@ -128,7 +119,7 @@ public class GetAndWriteFileTask extends AsyncTask<String, String, Boolean> {
         boolean writeResult = false;
         if(bytes != null && bytes.length > 0) {
             try {
-                File savePath = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + FOLDER_NAME);
+                File savePath = new File(FileHandler.getExternalSavePath());
                 if (!savePath.exists()) {
                     Log.i(TAG, "create path : " + savePath.mkdirs());
                 }

@@ -1,6 +1,23 @@
 <resources>
     <string name="app_name">GetDataApp</string>
 
+    <string name="read_file">點選READ FILE選取參數的txt檔案</string>
+    <string name="analyze_file">開始分析參數</string>
+    <string name="analyze_complete">分析參數完成，請點選START GET開始抓資料</string>
+    <string name="get_start">抓取資料中...</string>
+    <string name="get_complete">所有資料抓完</string>
+    <string name="get_from">資料抓完後，請在%s路徑中取得所有結果</string>
+    <string name="re_read_file">或重新</string>
+
+    <string name="file_template"><center>txt檔案內容範例:\n\n\n</center>
+        xml,台灣積體電路製造股份有限公司,01\n
+        xml,椅王興業有限公司,01\n
+        xml,立洋企業有限公司,01\n
+        .\n
+        .\n
+        .\n
+    </string>
+
     <!-- message text on the modal after user declined a permission request. 1st parameter is app name, 2nd parameter for permission name -->
     <string name="declined_permission_message">要使用這app需要%1$s的權限，請到設定裡面打開權限.</string>
     <!-- storage permission rationale message -->
