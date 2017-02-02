@@ -3,7 +3,6 @@ package com.project.getdataapp;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -23,7 +22,7 @@ import static org.apache.http.protocol.HTTP.USER_AGENT;
  * Created by billy_chi on 2017/1/26.
  */
 
-public class GetAndWriteFileTask extends AsyncTask<Void, String, Boolean> {
+public class GetAndWriteFileTask extends AsyncTask<String, String, Boolean> {
     private static final String TAG = "GetAndWriteTask";
 
     private static final String URL_TEMPLATE =
@@ -34,42 +33,42 @@ public class GetAndWriteFileTask extends AsyncTask<Void, String, Boolean> {
     private UrlParameter mParameter;
 
     private String mTargetUrl;
+    public String mTaskName;
 
     // Callback when task finished
     public interface Callback {
-        void onFinished(boolean result);
+        void onFinished(boolean result, String name);
     }
     public Callback mCallback;
 
     public GetAndWriteFileTask(UrlParameter parameter, Callback callback) {
         mParameter = parameter;
         mCallback = callback;
-        setupUrl();
+        if(mParameter != null) {
+            setupUrl();
+        }
     }
 
     private void setupUrl() {
         try {
             String url = String.format(URL_TEMPLATE, mParameter.mFormat, mParameter.mCompanyName, mParameter.mStatus);
             mTargetUrl = url.replace(" ", "%20");
+            mTaskName = mParameter.mCompanyName;
         } catch (Exception e) {
             Log.e(TAG, "Exception, setupUrl failed: " + e.getStackTrace());
         }
     }
 
     @Override
-    protected void onPreExecute() {
-        Log.i(TAG, "[onPreExecute]");
-    }
-
-    @Override
-    protected Boolean doInBackground(Void... params) {
+    protected Boolean doInBackground(String... params) {
         boolean result = false;
+        Log.i(TAG, "start getData for " + mTaskName);
         byte[] bytes = getDataFromUrl();
-        publishProgress("getData");
+        Log.i(TAG, "getData for " + mTaskName + " completed");
         if (isExternalStorageWritable()) {
-            publishProgress("saveData");
             result = writeToExternalPublicFile(bytes);
         } else {
+            Log.i(TAG, "[doInBackground] unable to get external storage");
             //Todo: write to internal
         }
         return result;
@@ -77,15 +76,19 @@ public class GetAndWriteFileTask extends AsyncTask<Void, String, Boolean> {
 
     @Override
     protected void onProgressUpdate(String... values) {
-        Log.i(TAG, "[onProgressUpdate] " + values);
-        super.onProgressUpdate(values);
+        if(values != null && values.length > 0) {
+            Log.i(TAG, "[onProgressUpdate] " + values[0]);
+            super.onProgressUpdate(values);
+        }
     }
 
     @Override
     protected void onPostExecute(Boolean result) {
-        Log.i(TAG, "[onPostExecute]");
         if(mCallback != null) {
-            mCallback.onFinished(result);
+            Log.i(TAG, "[onPostExecute] " + mTaskName);
+            mCallback.onFinished(result, mTaskName);
+        } else {
+            Log.w(TAG, "[onPostExecute] " + mTaskName + " callback is null");
         }
     }
 
@@ -107,7 +110,7 @@ public class GetAndWriteFileTask extends AsyncTask<Void, String, Boolean> {
         } catch (FileNotFoundException e) {
             Log.e(TAG, "File not found: " + e.toString());
         } catch (IOException e) {
-            Log.e(TAG, "Can not read file: " + e.toString());
+            Log.e(TAG, "IOException: " + e.toString());
         }
         return null;
     }
@@ -130,12 +133,11 @@ public class GetAndWriteFileTask extends AsyncTask<Void, String, Boolean> {
                     Log.i(TAG, "create path : " + savePath.mkdirs());
                 }
 
-                File file = new File(savePath, mParameter.mCompanyName + ".txt");
+                File file = new File(savePath, mTaskName + ".txt");
                 FileOutputStream fos = new FileOutputStream(file);
-                Log.i(TAG, "write file");
                 fos.write(bytes);
                 fos.close();
-                Log.i(TAG, "write file complete");
+                Log.i(TAG, mTaskName + "write file complete");
                 writeResult = true;
             } catch (IOException e) {
                 Log.e(TAG, "Exception, file write failed: " + e.getStackTrace());
@@ -144,5 +146,9 @@ public class GetAndWriteFileTask extends AsyncTask<Void, String, Boolean> {
             Log.e(TAG, "data is null");
         }
         return writeResult;
+    }
+
+    public void removeCallBack() {
+        mCallback = null;
     }
 }
