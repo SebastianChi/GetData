@@ -18,39 +18,8 @@ import java.io.File;
  */
 
 public class FileHandler {
-    private final Activity activity;
-    private static final String FOLDER_NAME = "/gcis_data";
 
-    public FileHandler(final Activity activity) {
-        this.activity = activity;
-    }
-
-    /**
-     * 從Uri取得絕對路徑。
-     *
-     * @param context 傳入Context
-     * @param uri     傳入Uri物件
-     * @return 傳回絕對路徑，若絕對路徑無法取得，傳回null
-     */
-    public static String getAbsolutePathFromUri(final Context context, final Uri uri) {
-        return getAbsolutePathFromUri(context, uri, false);
-    }
-
-    /**
-     * 從Uri取得絕對路徑。
-     *
-     * @param context     傳入Context
-     * @param uri         傳入Uri物件
-     * @param mustCanRead 傳入Uri所指的路徑是否一定要可以讀取
-     * @return 傳回絕對路徑，若絕對路徑無法取得或是無法讀取，傳回null
-     */
-    public static String getAbsolutePathFromUri(final Context context, final Uri uri, final boolean mustCanRead) {
-        final File file = getFileFromUri(context, uri, mustCanRead);
-        if (file != null) {
-            return file.getAbsolutePath();
-        } else {
-            return null;
-        }
+    public FileHandler() {
     }
 
     /**
@@ -140,16 +109,6 @@ public class FileHandler {
     /**
      * 將路徑轉成File物件。
      *
-     * @param path 傳入檔案路徑
-     * @return 傳回File物件，若File物件無法建立，傳回null。
-     */
-    public static File createFileObjFromPath(final String path) {
-        return createFileObjFromPath(path, false);
-    }
-
-    /**
-     * 將路徑轉成File物件。
-     *
      * @param path        傳入檔案路徑
      * @param mustCanRead 傳入檔案路徑是否一定要可以讀取
      * @return 傳回File物件，若File物件無法建立或是檔案路徑無法讀取，傳回null
@@ -197,7 +156,14 @@ public class FileHandler {
         return null;
     }
 
-    public static String getExternalSavePath() {
-        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + FOLDER_NAME;
+
+    /**
+     * Get external save path
+     *
+     * @param path Desired path string
+     * @return Return result absolute path
+     */
+    public static String getExternalSavePath(String path) {
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + path;
     }
 }

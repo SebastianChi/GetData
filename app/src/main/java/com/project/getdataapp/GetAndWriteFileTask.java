@@ -22,13 +22,10 @@ import static org.apache.http.protocol.HTTP.USER_AGENT;
  * Created by billy_chi on 2017/1/26.
  */
 
-public class GetAndWriteFileTask extends AsyncTask<String, String, Boolean> {
+public class GetAndWriteFileTask extends AsyncTask<Void, String, Boolean> {
     private static final String TAG = "GetAndWriteTask";
 
-    private static final String URL_TEMPLATE =
-            "http://data.gcis.nat.gov.tw/od/data/api/6BBA2268-1367-4B42-9CCA-BC17499EBE8C?$format=%s" +
-            "&$filter=Company_Name like %s" +
-            " and Company_Status eq %s";
+    private static final String mUrlTemplate = Constants.URL_TEMPLATE;
     private UrlParameter mParameter;
 
     private String mTargetUrl;
@@ -38,6 +35,7 @@ public class GetAndWriteFileTask extends AsyncTask<String, String, Boolean> {
     public interface Callback {
         void onFinished(boolean result, String name);
     }
+
     public Callback mCallback;
 
     public GetAndWriteFileTask(UrlParameter parameter, Callback callback) {
@@ -48,9 +46,13 @@ public class GetAndWriteFileTask extends AsyncTask<String, String, Boolean> {
         }
     }
 
+
+    /**
+     * Setup Url by parameters (format, companyName and status)
+     */
     private void setupUrl() {
         try {
-            String url = String.format(URL_TEMPLATE, mParameter.mFormat, mParameter.mCompanyName, mParameter.mStatus);
+            String url = String.format(mUrlTemplate, mParameter.mFormat, mParameter.mCompanyName, mParameter.mStatus);
             mTargetUrl = url.replace(" ", "%20");
             mTaskName = mParameter.mCompanyName;
         } catch (Exception e) {
@@ -58,8 +60,13 @@ public class GetAndWriteFileTask extends AsyncTask<String, String, Boolean> {
         }
     }
 
+    /**
+     * Get data from url, then save into external storage
+     *
+     * @return Return result of getting and saving data from web
+     */
     @Override
-    protected Boolean doInBackground(String... params) {
+    protected Boolean doInBackground(Void... params) {
         boolean result = false;
         Log.i(TAG, "start getData for " + mTaskName);
         byte[] bytes = getDataFromUrl();
@@ -73,6 +80,10 @@ public class GetAndWriteFileTask extends AsyncTask<String, String, Boolean> {
         return result;
     }
 
+
+    /**
+     * Callback to caller
+     */
     @Override
     protected void onPostExecute(Boolean result) {
         if(mCallback != null) {
@@ -83,6 +94,12 @@ public class GetAndWriteFileTask extends AsyncTask<String, String, Boolean> {
         }
     }
 
+
+    /**
+     * Get data from target url
+     *
+     * @return Return byte array result
+     */
     private byte[] getDataFromUrl() {
         HttpClient client = new DefaultHttpClient();
         HttpGet request = new HttpGet(mTargetUrl);
@@ -106,7 +123,12 @@ public class GetAndWriteFileTask extends AsyncTask<String, String, Boolean> {
         return null;
     }
 
-    /* Checks if external storage is available for read and write */
+
+    /**
+     * Checks if external storage is available for read and write
+     *
+     * @return Return external storage is writable or not
+     */
     private boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
@@ -115,11 +137,17 @@ public class GetAndWriteFileTask extends AsyncTask<String, String, Boolean> {
         return false;
     }
 
+
+    /**
+     * Writing data to external storage
+     *
+     * @return Return result of writing data to external storage
+     */
     private boolean writeToExternalPublicFile(byte[] bytes) {
         boolean writeResult = false;
         if(bytes != null && bytes.length > 0) {
             try {
-                File savePath = new File(FileHandler.getExternalSavePath());
+                File savePath = new File(FileHandler.getExternalSavePath(Constants.FOLDER_NAME));
                 if (!savePath.exists()) {
                     Log.i(TAG, "create path : " + savePath.mkdirs());
                 }
@@ -139,6 +167,9 @@ public class GetAndWriteFileTask extends AsyncTask<String, String, Boolean> {
         return writeResult;
     }
 
+    /**
+     * Remove callback
+     */
     public void removeCallBack() {
         mCallback = null;
     }

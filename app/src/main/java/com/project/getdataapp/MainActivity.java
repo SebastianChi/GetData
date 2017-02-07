@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,8 +24,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "GetActivity";
-
-    private static final int READ_FILE_REQUEST_CODE = 1101;
 
     String mStartDescription;
     String mResultDescription;
@@ -77,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         //For testing
         //getFakeData();
         mStartDescription = getString(R.string.read_file);
-        mResultDescription = String.format(getString(R.string.get_from), FileHandler.getExternalSavePath());
+        mResultDescription = String.format(getString(R.string.get_from), FileHandler.getExternalSavePath(Constants.FOLDER_NAME));
 
         mResultView.setText(mStartDescription);
         mTemplateView.setText(getString(R.string.file_template));
@@ -86,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkPermission() {
         if(!PermissionUtil.hasStoragePermissions(MainActivity.this)) {
             Intent intent = PermissionUtil.getStoragePermissionsIntent(MainActivity.this);
-            startActivityForResult(intent, PermissionUtil.REQUEST_PERMISSION);
+            startActivityForResult(intent, Constants.REQUEST_PERMISSION_REQUEST_CODE);
         }
     }
 
@@ -104,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                             if (mUrlParameters[i] != null && mUrlParameters[i].isValid()) {
                                 GetAndWriteFileTask task = new GetAndWriteFileTask(mUrlParameters[i], mTaskCompleteCallback);
                                 try {
-                                    task.execute(mUrlParameters[i].mCompanyName);
+                                    task.execute();
                                 } catch (Exception e) {
                                     Log.e(TAG, task.mTaskName + " task exception, " + e);
                                     task.removeCallBack();
@@ -163,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
-        startActivityForResult(intent, READ_FILE_REQUEST_CODE);
+        startActivityForResult(intent, Constants.READ_FILE_REQUEST_CODE);
     }
 
     private void parseFileToParameters(InputStream is) {
@@ -229,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == RESULT_OK) {
-            if (requestCode == READ_FILE_REQUEST_CODE) {
+            if (requestCode == Constants.READ_FILE_REQUEST_CODE) {
                 Uri uri;
                 if (data != null) {
                     uri = data.getData();
@@ -250,9 +247,9 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(this, "不是txt檔案", Toast.LENGTH_LONG).show();
                     }
                 }
-            } else if(requestCode == PermissionUtil.REQUEST_PERMISSION) {
+            } else if(requestCode == Constants.REQUEST_PERMISSION_REQUEST_CODE) {
                 if (data != null) {
-                    boolean result = data.getBooleanExtra(PermissionUtil.KEY_PERMISSION_RESULT, false);
+                    boolean result = data.getBooleanExtra(Constants.EXTRA_PERMISSION_RESULT, false);
                     Log.i(TAG, "request permission result : " + result);
                     if(!result) {
                         this.finish();

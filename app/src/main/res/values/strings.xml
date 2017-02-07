@@ -1,14 +1,22 @@
 <resources>
     <string name="app_name">GetDataApp</string>
 
+    <!-- Description of read file button -->
     <string name="read_file">點選READ FILE選取參數的txt檔案</string>
+    <!-- Description of starting analyze -->
     <string name="analyze_file">開始分析參數</string>
+    <!-- Description of analyzing complete -->
     <string name="analyze_complete">分析參數完成，請點選START GET開始抓資料</string>
+    <!-- Getting file -->
     <string name="get_start">抓取資料中...</string>
+    <!-- Get file complete -->
     <string name="get_complete">所有資料抓完</string>
+    <!-- Description of getting file complete -->
     <string name="get_from">資料抓完後，請在%s路徑中取得所有結果</string>
+    <!-- Prefix of re-read file  -->
     <string name="re_read_file">或重新</string>
 
+    <!-- Example for txt file -->
     <string name="file_template"><center>txt檔案內容範例:\n\n\n</center>
         xml,台灣積體電路製造股份有限公司,01\n
         xml,椅王興業有限公司,01\n

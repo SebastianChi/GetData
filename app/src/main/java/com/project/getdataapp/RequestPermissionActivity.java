@@ -55,19 +55,19 @@ public class RequestPermissionActivity extends Activity {
             return;
         }
 
-        if(intent.hasExtra(PermissionUtil.EXTRA_REQUIRED_PERMISSIONS)) {
-            mRequiredPermissions = intent.getStringArrayExtra(PermissionUtil.EXTRA_REQUIRED_PERMISSIONS);
+        if(intent.hasExtra(Constants.EXTRA_REQUIRED_PERMISSIONS)) {
+            mRequiredPermissions = intent.getStringArrayExtra(Constants.EXTRA_REQUIRED_PERMISSIONS);
         }
 
-        if(intent.hasExtra(PermissionUtil.EXTRA_PERMISSIONS_TYPE)) {
-            mRequestCode = intent.getIntExtra(PermissionUtil.EXTRA_PERMISSIONS_TYPE, 0);
+        if(intent.hasExtra(Constants.EXTRA_PERMISSIONS_TYPE)) {
+            mRequestCode = intent.getIntExtra(Constants.EXTRA_PERMISSIONS_TYPE, 0);
         }
     }
 
     private void setFinishResult(int resultCode, boolean result) {
         Log.i(TAG, "setFinishResult, resultCode:" + resultCode + ", result:" + result);
         Intent returnIntent = new Intent();
-        returnIntent.putExtra(PermissionUtil.KEY_PERMISSION_RESULT, result);
+        returnIntent.putExtra(Constants.EXTRA_PERMISSION_RESULT, result);
         setResult(resultCode, returnIntent);
         finish();
     }
@@ -221,7 +221,7 @@ public class RequestPermissionActivity extends Activity {
             MyDialogData data = new MyDialogData();
             String permissionCategory;
             switch (mRequestCode) {
-                case PermissionUtil.REQUEST_EXTERNALSTORAGE_PERMISSION:
+                case Constants.REQUEST_EXTERNALSTORAGE_PERMISSION:
                 default:
                     permissionCategory = activity.getResources().getString(R.string.permission_storage);
                     break;
@@ -311,7 +311,7 @@ public class RequestPermissionActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == PermissionUtil.REQUEST_PERMISSION) {
+        if(requestCode == Constants.REQUEST_PERMISSION_REQUEST_CODE) {
             Log.i(TAG, "[onActivityResult] REQUEST_PERMISSION");
 
             if (hasRequestPermissionGranted()) {
@@ -328,20 +328,20 @@ public class RequestPermissionActivity extends Activity {
             //Open the specific App Info page:
             Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
             intent.setData(Uri.parse("package:" + activity.getPackageName()));
-            activity.startActivityForResult(intent, PermissionUtil.REQUEST_PERMISSION);
+            activity.startActivityForResult(intent, Constants.REQUEST_PERMISSION_REQUEST_CODE);
 
         } catch ( ActivityNotFoundException e ) {
 
             //Open the generic Apps page:
             Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
-            activity.startActivityForResult(intent, PermissionUtil.REQUEST_PERMISSION);
+            activity.startActivityForResult(intent, Constants.REQUEST_PERMISSION_REQUEST_CODE);
         }
     }
 
     private boolean hasRequestPermissionGranted() {
         boolean result = false;
         switch (mRequestCode) {
-            case PermissionUtil.REQUEST_EXTERNALSTORAGE_PERMISSION:
+            case Constants.REQUEST_EXTERNALSTORAGE_PERMISSION:
                 result = PermissionUtil.hasStoragePermissions(this);
                 break;
             default:
